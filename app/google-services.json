@@ -1,0 +1,51 @@
+{
+  "project_info": {
+    "project_number": "1048218450634",
+    "project_id": "sdahyoruba"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1048218450634:android:64f1aa19dc8bfcd5",
+        "android_client_info": {
+          "package_name": "com.jcedar.sdahyoruba"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1048218450634-ijmk294ana0pgrfj5633b936tko1ine6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.jcedar.sdahyoruba",
+            "certificate_hash": "B14A759F9EC24F1B4864C10A28B0FB74C6E6BC6B"
+          }
+        },
+        {
+          "client_id": "1048218450634-ogn1kis35clenke452qidvcp1ftmh581.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC7yUCrDafScHs31e55-_PTygmYkAC1gnk"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 2,
+          "analytics_property": {
+            "tracking_id": "UA-78419650-2"
+          }
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
