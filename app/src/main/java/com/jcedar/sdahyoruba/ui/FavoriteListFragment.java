@@ -210,8 +210,6 @@ public class FavoriteListFragment extends Fragment implements LoaderManager.Load
                     data.getColumnIndex(DataContract.FavoriteHymns.SONG_ID));
 
             mCallback.onFavoriteSelected(Id);
-
-
         }
     };
     @Override
