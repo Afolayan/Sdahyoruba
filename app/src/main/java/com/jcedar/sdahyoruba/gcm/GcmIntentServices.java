@@ -26,7 +26,6 @@ import com.jcedar.sdahyoruba.helper.AccountUtils;
 import com.jcedar.sdahyoruba.helper.AppSettings;
 import com.jcedar.sdahyoruba.helper.PrefUtils;
 import com.jcedar.sdahyoruba.sync.SyncHelper;
-import com.jcedar.sdahyoruba.ui.DashboardActivity;
 import com.jcedar.sdahyoruba.ui.NewDashBoardActivity;
 
 import org.json.JSONArray;
@@ -202,7 +201,7 @@ public class GcmIntentServices extends IntentService {
                 this.getSystemService(Context.NOTIFICATION_SERVICE);
 
         PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
-                new Intent(this, DashboardActivity.class),
+                new Intent(this, NewDashBoardActivity.class),
                 0);
 
         Intent sendSMS = new Intent(Intent.ACTION_VIEW).putExtra("address", AccountUtils.getPhoneNumber(this)).setType("vnd.android-dir/mms-sms");
@@ -214,14 +213,14 @@ public class GcmIntentServices extends IntentService {
 
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
-                        .setSmallIcon(R.mipmap.ic_user)
+                        .setSmallIcon(R.mipmap.ic_launcher)
                         .setContentTitle("VisiBook")
-                        .setSmallIcon(R.mipmap.ic_user)
+                        .setSmallIcon(R.mipmap.ic_launcher)
                         .setStyle(new NotificationCompat.BigTextStyle()
                                 .bigText(msg))
                         .setContentText(msg)
-                        .addAction(R.mipmap.ic_sms, "Send SMS", smsIntent )
-                        .addAction(R.mipmap.ic_call, "Call", callIntent )
+                        /*.addAction(R.mipmap.ic_sms, "Send SMS", smsIntent )
+                        .addAction(R.mipmap.ic_call, "Call", callIntent )*/
                         .setOngoing(true)
                         .setWhen(System.currentTimeMillis())
                 ;
@@ -254,7 +253,7 @@ public class GcmIntentServices extends IntentService {
             vibrate = 0;
         }
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this)
-                        .setSmallIcon(R.mipmap.ic_user)
+                        .setSmallIcon(R.mipmap.ic_launcher)
                         .setContentTitle(contentTitle)
                         .setStyle(new NotificationCompat.BigTextStyle()
                                 .bigText(message))

@@ -88,7 +88,7 @@ public class PagerFragment extends Fragment {
                 }
             });
 
-        }*/
+        }*/setRetainInstance(true);
 
     }
 
@@ -162,7 +162,6 @@ public class PagerFragment extends Fragment {
                 menuRed.toggle(true);
             }
         });
-
     }
 
 
@@ -172,18 +171,21 @@ public class PagerFragment extends Fragment {
             switch (v.getId()) {
                 case R.id.fab1: //share
                     fabListener.onHymnSharedFab(viewPager.getCurrentItem()+1);
+                    menuRed.close(true);
                     break;
                 case R.id.fab2: //favorites
                     /**
                      * insert selected row into favorites table
                      */
                     fabListener.onHymnLikedFab(viewPager.getCurrentItem()+1);
+                    menuRed.close(true);
                     break;
                 case R.id.fab3: //dialpad
                     /**
                      * display dialpad to go to number
                      */
                     startNumberFragment();
+                    menuRed.close(true);
                     break;
             }
         }

@@ -53,8 +53,10 @@ public class DataContract
         public static final String[] PROJECTION_ALL = {
                 _ID, SONG_ID, SONG_NAME, SONG_TEXT, ENGLISH_VERSION,
                 UPDATED,
-
-    };
+        };
+        public static final String[] PROJECTION = {
+                _ID, SONG_ID, SONG_NAME, ENGLISH_VERSION
+        };
 
         /** The default sort order for queries containing hymn */
         public static final String SORT_ORDER_DEFAULT = SONG_ID +" ASC";

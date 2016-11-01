@@ -9,6 +9,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.BaseColumns;
 import android.util.Log;
 
+import com.jcedar.sdahyoruba.io.model.Hymn;
+
 import java.util.ArrayList;
 
 public class DatabaseHelper extends SQLiteOpenHelper
@@ -183,6 +185,43 @@ public class DatabaseHelper extends SQLiteOpenHelper
 
         return data;
     }
+
+    public ArrayList<Hymn> getHymns( String query ){
+
+        ArrayList<Hymn> hymns = new ArrayList<>();
+        String selection = DataContract.Hymns.SONG_NAME + " LIKE '%" +query + "%'";
+        String[] projection = DataContract.Hymns.PROJECTION_ALL;
+        String sortOrder = DataContract.Hymns.SONG_NAME + " ASC";
+
+        Cursor c = mContext.getContentResolver().query(
+                DataContract.Hymns.CONTENT_URI, projection, selection,null, sortOrder);
+        if( c.moveToFirst() ){
+            do{
+                Hymn hymn = new Hymn();
+                hymn.setSongId(c.getString(c.getColumnIndex(DataContract.Hymns.SONG_ID)));
+                hymn.setSongTitle(c.getString(c.getColumnIndex(DataContract.Hymns.SONG_NAME)));
+                hymn.setSongText(c.getString(c.getColumnIndex(DataContract.Hymns.SONG_TEXT)));
+                hymn.setEnglishVersion(c.getString(c.getColumnIndex(DataContract.Hymns.ENGLISH_VERSION)));
+
+                hymns.add( hymn );
+            } while ( c.moveToNext() ) ;
+
+            c.close();
+        }
+
+        return hymns;
+    }
+    public Cursor getHymnsCursor( String query ){
+        String selection = DataContract.Hymns.SONG_NAME + " LIKE '%" +query + "%' OR "
+                +DataContract.Hymns.SONG_TEXT + " LIKE '%" +query+ "%'";
+        String[] projection = DataContract.Hymns.PROJECTION_ALL;
+        String sortOrder = DataContract.Hymns._ID + " ASC";
+
+
+        return mContext.getContentResolver().query(
+                DataContract.Hymns.CONTENT_URI, projection, selection,null, sortOrder);
+    }
+
     public ArrayList<Cursor> getData(String Query){
         //get writable database
         SQLiteDatabase sqlDB = this.getWritableDatabase();

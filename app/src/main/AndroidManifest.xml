@@ -30,11 +30,13 @@
          Google Maps Android API v2, but are recommended.
     -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" /> <!-- android:name=".app.VisiBook" -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
+    <!-- android:name=".app.VisiBook" -->
     <application
         android:name=".app.SdahYoruba"
         android:allowBackup="true"
-        android:icon="@mipmap/ic_add_white"
+        android:icon="@mipmap/ic_launcher"
         android:installLocation="auto"
         android:label="@string/app_name"
         android:screenOrientation="portrait"
@@ -51,31 +53,14 @@
         <provider
             android:name=".provider.SuggestionProvider"
             android:authorities="com.jcedar.sdahyoruba.provider.SuggestionProvider" />
-        <provider
-            android:name="com.facebook.FacebookContentProvider"
-            android:authorities="com.facebook.app.FacebookContentProvider924951214224981"
-            android:exported="true" />
-
-            <activity
-            android:name=".ui.DashboardActivity"
-            android:exported="true"
-            android:label="@string/app_name" >
-            <meta-data
-                android:name="android.app.searchable"
-                android:resource="@xml/searchable" />
-            <meta-data
-                android:name="android.app.default_searchable"
-                android:value=".ui.SearchActivity" />
 
 
-        </activity>
 
         <activity
             android:name=".ui.NewDashBoardActivity"
             android:configChanges="orientation|screenSize"
             android:exported="true"
             android:label="@string/app_name" >
-
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
@@ -83,34 +68,15 @@
 
                 <data android:mimeType="vnd.android.cursor.item/vnd.com.jcedar.sdahyoruba.provider.hymns" />
             </intent-filter>
-
-            </activity>
-        <activity
-            android:name=".ui.MainActivity"
-            android:label="@string/title_activity_main" />
+        </activity>
         <activity
             android:name=".ui.GoogleSignIn"
             android:label="SDAH Yoruba" >
-            <intent-filter>
+           <!-- <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-
-        </activity>
-        <activity
-            android:name="com.facebook.FacebookActivity"
-            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
-
-        <meta-data
-            android:name="com.facebook.sdk.ApplicationId"
-            android:value="@string/app_id" />
-
-        <activity
-            android:name=".ui.StudentDetailsActivity"
-            android:label="@string/title_activity_student_details" >
-
+            </intent-filter>-->
         </activity>
 
         <receiver
@@ -139,6 +105,17 @@
             android:name="com.google.android.maps.v2.API_KEY"
             android:value="@string/google_maps_key" />
 
+        <activity
+            android:name=".ui.Splash"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="SDAH Yoruba"
+            android:theme="@style/FullscreenTheme" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

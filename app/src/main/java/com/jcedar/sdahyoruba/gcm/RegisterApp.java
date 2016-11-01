@@ -8,12 +8,11 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.jcedar.sdahyoruba.helper.AccountUtils;
 import com.jcedar.sdahyoruba.helper.AppSettings;
-import com.jcedar.sdahyoruba.ui.MainActivity;
+import com.jcedar.sdahyoruba.ui.NewDashBoardActivity;
 
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -74,7 +73,7 @@ public class RegisterApp extends AsyncTask<Void, Void, String> {
     }
 
     private void storeRegistrationId(Context ctx, String regid) {
-        final SharedPreferences prefs = ctx.getSharedPreferences(MainActivity.class.getSimpleName(),
+        final SharedPreferences prefs = ctx.getSharedPreferences(NewDashBoardActivity.class.getSimpleName(),
                 Context.MODE_PRIVATE);
         Log.d(TAG, "Saving regId on app version " + appVersion);
         SharedPreferences.Editor editor = prefs.edit();
@@ -119,7 +118,7 @@ public class RegisterApp extends AsyncTask<Void, Void, String> {
     @Override
     protected void onPostExecute(String result) {
         super.onPostExecute(result);
-        Toast.makeText(ctx, "Registration Completed. Now you can see the notifications", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(ctx, "Registration Completed. Now you can see the notifications", Toast.LENGTH_SHORT).show();
         Log.d(TAG, result);
     }
 }

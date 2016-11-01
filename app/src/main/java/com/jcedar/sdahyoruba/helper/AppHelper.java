@@ -57,6 +57,37 @@ public class AppHelper  {
 
     }
 
+    public static void loadHymnDataFromFile(final Context context){
+
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        /**
+                         * 1. Load file, parse file reference to FileUtils
+                         * 2. Get the title and number
+                         * 3. Save respective value into db
+                         */
+                        String response =  FileUtils.readFromFile(context);
+
+                        Log.e(TAG, "response " + response);
+
+                        ArrayList<ContentProviderOperation> operations =
+                                new HymnHandler(context).parseHymns(response);
+                        if (operations.size() > 0) {
+                            ContentResolver resolver = context.getContentResolver();
+                            resolver.applyBatch(DataContract.CONTENT_AUTHORITY, operations);
+                        }
+                    }catch (IOException | OperationApplicationException | RemoteException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+            }).start();
+
+
+        }
+
 
 
 

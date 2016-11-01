@@ -19,16 +19,17 @@
 
     <color name="default_plan_color">@color/theme_primary</color>
 
-    <color name="theme_primary">#af2848</color>
+    <color name="theme_primary1">#af2848</color>
+    <color name="theme_primary">#e91e63</color>
     <color name="fab_colorNormal">#3949ab</color>
 
 
-    <color name="theme_primary_dark">#811d35</color>
-    <color name="theme_primary_light">#3949ab</color>
+    <color name="theme_primary_dark">#c2185b</color>
+    <color name="theme_primary_light">#f06292</color>
 
 <!--    <color name="theme_accent_1">#00b0ff</color>
     <color name="theme_accent_1_light">#8ad4fa</color>-->
-    <color name="theme_accent_1">#af2848</color>
+    <color name="theme_accent_1">#3949ab</color>
     <color name="theme_accent_1_light">#af2845</color>
 
     <color name="theme_accent_2">#e91e63</color>
@@ -106,4 +107,6 @@
     <color name="fragment_black">#1c1c1c</color>
     <color name="white_text">#ffffff</color>
     <color name="black_innertransparent">#1A000000</color>
+
+    <color name="black_overlay">#66000000</color>
 </resources>

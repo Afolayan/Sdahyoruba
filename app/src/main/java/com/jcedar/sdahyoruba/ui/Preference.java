@@ -10,7 +10,6 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.SwitchPreference;
 
-import com.facebook.appevents.AppEventsLogger;
 import com.jcedar.sdahyoruba.R;
 
 public class Preference extends PreferenceFragment {
@@ -96,15 +95,4 @@ public class Preference extends PreferenceFragment {
         }
     }
 
-    @Override
-    public void onPause() {
-        super.onPause();
-        AppEventsLogger.activateApp(getActivity());
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        AppEventsLogger.deactivateApp( getActivity());
-    }
 }

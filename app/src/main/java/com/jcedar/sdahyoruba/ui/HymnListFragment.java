@@ -1,6 +1,7 @@
 package com.jcedar.sdahyoruba.ui;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.database.ContentObserver;
 import android.database.Cursor;
 import android.net.Uri;
@@ -10,7 +11,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
@@ -23,10 +23,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.jcedar.sdahyoruba.R;
-import com.jcedar.sdahyoruba.adapter.RecyclerCursorAdapterAll;
+import com.jcedar.sdahyoruba.adapter.RecyclerCursorAdapter;
+import com.jcedar.sdahyoruba.helper.FontChangeCrawler;
 import com.jcedar.sdahyoruba.provider.DataContract;
 
 import java.util.Arrays;
@@ -37,24 +37,16 @@ public class HymnListFragment extends Fragment implements LoaderManager.LoaderCa
 
 
     // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
     private static final String ARG_IDS = "ids";
     private static final String SEARCH_KEY = "SEARCH_KEY";
 
-    // TODO: Rename and change types of parameters
-    private int mPosition;
-    private String mParam2;
-    private TextView tvError;
-    private Bundle mHomeBundle = Bundle.EMPTY;
-    private String _POSITION = "position";
     private String LOADER_KEY = "loader_key";
     private Listener mCallback;
     static String context;
 
     RecyclerView recyclerView;
-    RecyclerCursorAdapterAll resultsCursorAdapter;
+    RecyclerCursorAdapter resultsCursorAdapter;
     View rootView;
     String[] idsToLoad;
 
@@ -64,6 +56,7 @@ public class HymnListFragment extends Fragment implements LoaderManager.LoaderCa
 
     static int presentId;
     MenuItem aToZ, numerical;
+    private TextView tvError;
 
     public static HymnListFragment newInstance(int position) {
         HymnListFragment fragment = new HymnListFragment();
@@ -93,8 +86,12 @@ public class HymnListFragment extends Fragment implements LoaderManager.LoaderCa
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         // Initialize loader
-        //getLoaderManager().initLoader(NORMAL_LOADER_ID, null, this);
+        getLoaderManager().initLoader(NORMAL_LOADER_ID, null, this);
 
+        //changing the fonts
+        FontChangeCrawler fontChanger =
+                new FontChangeCrawler(getActivity().getAssets(), "fonts/proxima-nova-regular.ttf");
+        fontChanger.replaceFonts((ViewGroup) this.getView());
     }
 
     @Override
@@ -106,13 +103,12 @@ public class HymnListFragment extends Fragment implements LoaderManager.LoaderCa
         } else {
             presentId = NORMAL_LOADER_ID;
         }
-
+        //getLoaderManager().initLoader(0, null, this);
         if (getArguments() != null) {
             idsToLoad = getArguments().getStringArray(ARG_IDS);
             Log.e(TAG, "ids " + Arrays.toString(idsToLoad));
             getLoaderManager().initLoader(A_Z_LOADER_ID, null, this);
         }
-
 
         context = getActivity().getClass().getSimpleName();
 
@@ -150,7 +146,7 @@ public class HymnListFragment extends Fragment implements LoaderManager.LoaderCa
 
 
         recyclerView = (RecyclerView) rootView.findViewById( R.id.recyclerview );
-        resultsCursorAdapter = new RecyclerCursorAdapterAll( getActivity() );
+        resultsCursorAdapter = new RecyclerCursorAdapter( getActivity(), HymnListFragment.this );
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         //recyclerView.setLayoutManager(new WrappingLinearLayoutManager(getContext()));
@@ -159,11 +155,6 @@ public class HymnListFragment extends Fragment implements LoaderManager.LoaderCa
 
         recyclerView.setAdapter(resultsCursorAdapter);
 
-        RecyclerView.ItemAnimator itemAnimator = new DefaultItemAnimator();
-        itemAnimator.setAddDuration(1000);
-        itemAnimator.setRemoveDuration(1000);
-        recyclerView.setItemAnimator(itemAnimator);
-
 
         new Handler().post(new Runnable() {
             @Override
@@ -171,7 +162,7 @@ public class HymnListFragment extends Fragment implements LoaderManager.LoaderCa
                 getActivity().setTitle("Topical Index");
             }
         });
-        resultsCursorAdapter.setOnItemClickListener(new RecyclerCursorAdapterAll.OnItemClickListener() {
+        resultsCursorAdapter.setOnItemClickListener(new RecyclerCursorAdapter.OnItemClickListener() {
             @Override
             public void onItemClicked(Cursor data) {
 
@@ -212,19 +203,31 @@ public class HymnListFragment extends Fragment implements LoaderManager.LoaderCa
             case ( R.id.action_numerical):
                 if(item.isChecked()) item.setChecked(false);
                 else item.setChecked(true);
-                Toast.makeText(getActivity(), "Numerical", Toast.LENGTH_SHORT).show();
                 getLoaderManager().restartLoader(NORMAL_LOADER_ID, null, this);
                 break;
             case R.id.action_alpha:
                 if(item.isChecked()) item.setChecked(false);
                 else item.setChecked(true);
-                Toast.makeText(getActivity(), "A-Z", Toast.LENGTH_SHORT).show();
                 getLoaderManager().restartLoader(A_Z_LOADER_ID, null, this);
                 break;
             default:
                 return super.onOptionsItemSelected(item);
+
         }
         return true;
+    }
+
+    ProgressDialog dialog;
+
+    private void startDialog(){
+        dialog = new ProgressDialog(getActivity());
+        dialog.setIndeterminate(true);
+        dialog.show();
+    }
+    private void stopDialog(){
+        if( dialog != null ){
+            dialog.dismiss();
+        }
     }
 
 
@@ -267,28 +270,21 @@ public class HymnListFragment extends Fragment implements LoaderManager.LoaderCa
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         Uri uri = DataContract.Hymns.CONTENT_URI;
 
+        String[] projection = DataContract.Hymns.PROJECTION;
+        String selection, sortOrder;
+
         switch (id){
             case NORMAL_LOADER_ID:
                 presentId = NORMAL_LOADER_ID;
-                return new CursorLoader(
-                    getActivity(),
-                    uri,
-                    DataContract.Hymns.PROJECTION_ALL,
-                    null,    // selection
-                    null,           // arguments
-                    DataContract.Hymns._ID + " ASC"
-            );
-            case A_Z_LOADER_ID:{
-                presentId = A_Z_LOADER_ID;
+                selection = null;
+                sortOrder = DataContract.Hymns._ID + " ASC";
+                break;
 
-                return new CursorLoader(
-                        getActivity(),
-                        uri,
-                        DataContract.Hymns.PROJECTION_ALL,
-                        null,    // selection
-                        null,           // arguments
-                        DataContract.Hymns.SONG_NAME + " ASC");
-            }
+            case A_Z_LOADER_ID:
+                presentId = A_Z_LOADER_ID;
+                selection = null;
+                sortOrder = DataContract.Hymns.SONG_NAME + " ASC";
+                break;
 
             case SEARCH_LOADER_ID: {
                 presentId = SEARCH_LOADER_ID;
@@ -296,62 +292,63 @@ public class HymnListFragment extends Fragment implements LoaderManager.LoaderCa
                 if (args != null) {
                     String query = args.getString(SEARCH_KEY);
 
-                    String selection1 = DataContract.Hymns.SONG_NAME + " LIKE '%" +query + "%'";
+                    selection = DataContract.Hymns.SONG_NAME + " LIKE '%" +query + "%'";
+                    sortOrder = DataContract.Hymns.SONG_NAME + " ASC";
 
-                    return new CursorLoader(
-                            getActivity(),
-                            uri,
-                            DataContract.Hymns.PROJECTION_ALL,
-                            selection1,    // selection
-                            null,           // arguments
-                            DataContract.Hymns.SONG_NAME + " ASC");
-
+                    break;
                     } else {
-                    return new CursorLoader(
-                            getActivity(),
-                            uri,
-                            DataContract.Hymns.PROJECTION_ALL,
-                            null,    // selection
-                            null,           // arguments
-                            DataContract.Hymns.SONG_NAME + " ASC");
+                            selection = null;
+                            sortOrder = DataContract.Hymns.SONG_NAME + " ASC";
+                            break;
                     }
                 }
 
-            default:{
+            default:
                 presentId = NORMAL_LOADER_ID;
-                return new CursorLoader(
-                        getActivity(),
-                        uri,
-                        DataContract.Hymns.PROJECTION_ALL,
-                        null,    // selection
-                        null,           // arguments
-                        DataContract.Hymns.SONG_NAME + " ASC");
-            }
+                selection = null;
+                sortOrder = DataContract.Hymns.SONG_NAME + " ASC";
+                break;
+
         }
+
+        return new CursorLoader(
+                getActivity(),
+                uri,
+                projection,
+                selection,    // selection
+                null,   // arguments
+                sortOrder
+        );
 
     }
 
 
     @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+    public void onLoadFinished(Loader<Cursor> loader, final Cursor cursor) {
 
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if(cursor.moveToFirst()) {
+                    resultsCursorAdapter.swapCursor(cursor);
+                }
+            }
+        }, 200);
 
-        if(cursor.moveToFirst()) {
+        /*if(cursor.moveToFirst()) {
             resultsCursorAdapter.swapCursor(cursor);
-
-        }
-
+        }*/
 
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        //resultsCursorAdapter.swapCursor(null);
+        resultsCursorAdapter.swapCursor(null);
     }
 
 
     interface Listener {
-        void onHymnSelected(long hymnId);
+        void onHymnSelected(long hymnId); 
         void onFragmentDetached(Fragment fragment);
         void onFragmentAttached(Fragment fragment);
     }

@@ -37,7 +37,7 @@
         android:id="@+id/fab2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@mipmap/ic_fav"
+        android:src="@mipmap/ic_favorite2"
         fab:fab_size="mini"
         fab:fab_label="Add to Favorites" />
 

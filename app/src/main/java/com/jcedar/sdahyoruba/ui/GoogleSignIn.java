@@ -80,7 +80,8 @@ public class GoogleSignIn extends FragmentActivity implements GoogleApiClient.On
         //checkPhoneNumber = (Button) findViewById(R.id.checkPhoneNumber);
         btnSignIn = (SignInButton) findViewById(R.id.btn_sign_in);
 
-        btnSignIn.setOnClickListener(this);
+        btnSignIn.setVisibility(View.GONE);
+        //btnSignIn.setOnClickListener(this);
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
@@ -92,6 +93,7 @@ public class GoogleSignIn extends FragmentActivity implements GoogleApiClient.On
                 .build();
         // [END build_client]
 
+        signIn();
         //checkPhoneNumber.setOnClickListener(this);
     }
 
@@ -107,6 +109,7 @@ public class GoogleSignIn extends FragmentActivity implements GoogleApiClient.On
             Intent dashbIntent = new Intent(this, NewDashBoardActivity.class);
             dashbIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(dashbIntent);
+            finish();
 
         }
     }
@@ -199,15 +202,27 @@ public class GoogleSignIn extends FragmentActivity implements GoogleApiClient.On
 
             new LoadProfileImage().execute(personPhotoUrl);
         } else {
-            Bitmap def = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_default_user);
+            /*Bitmap def = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_default_user);
 
             UIUtils.setProfilePic(this, def);
-            enterDashBoard();
+            enterDashBoard();*/
+
+            new LoadProfileImage1().execute();
 
         }
 
         Toast.makeText(getApplicationContext(), "Please wait while data is loaded", Toast.LENGTH_SHORT).show();
-        AppHelper.pullAndSaveAllHymnData(context);
+        /**
+         * This will load data from internet
+         */
+        //AppHelper.pullAndSaveAllHymnData(context);
+
+        /**
+         * Load data from file here instead of from internet
+         * AppHelper.loadHymnDataFromFile()
+         */
+        AppHelper.loadHymnDataFromFile(context);
+
 
         //register app for gcm
         new Thread(new Runnable() {
@@ -293,6 +308,57 @@ public class GoogleSignIn extends FragmentActivity implements GoogleApiClient.On
         }
     }
 
+    private class LoadProfileImage1 extends AsyncTask<Void, Void, Bitmap> {
+        Bitmap bitmap = GoogleSignIn.bResult;
+
+        public LoadProfileImage1() {
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            dialog.setIndeterminate(true);
+            dialog.setCancelable(false);
+            dialog.setMessage("Getting Required Data....");
+            dialog.show();
+
+        }
+
+        protected Bitmap doInBackground(Void... urls) {
+            Bitmap mIcon11 = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_default_user);
+
+            Log.e(TAG, "Bitmap returned" + mIcon11);
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return mIcon11;
+        }
+
+        protected void onPostExecute(Bitmap result) {
+            this.bitmap=result;
+
+            if (result != null){
+                UIUtils.setProfilePic(GoogleSignIn.this, result);
+
+            }else {
+            }
+            enterDashBoard();
+
+            try {
+                if ((dialog != null) && dialog.isShowing()) {
+                    dialog.dismiss();
+                }
+            } catch (final Exception e) {
+                // Handle or log or ignore
+            } finally {
+                dialog = null;
+
+            }
+        }
+    }
+
 
 
 
@@ -306,6 +372,7 @@ public class GoogleSignIn extends FragmentActivity implements GoogleApiClient.On
 
 
     public void enterDashBoard() {
+
         startActivity(new Intent(GoogleSignIn.this, NewDashBoardActivity.class));
         AccountUtils.setFirstRun(false, GoogleSignIn.this);
         GoogleSignIn.this.finish();

@@ -18,7 +18,6 @@ import com.jcedar.sdahyoruba.helper.PrefUtils;
 import com.jcedar.sdahyoruba.helper.ServiceHandler;
 import com.jcedar.sdahyoruba.helper.UIUtils;
 import com.jcedar.sdahyoruba.io.jsonhandlers.HymnHandler;
-import com.jcedar.sdahyoruba.io.jsonhandlers.StudentUpdateHandler;
 import com.jcedar.sdahyoruba.provider.DataContract;
 
 import java.io.IOException;
@@ -128,30 +127,26 @@ public class SyncHelper {
 
         if( isOnline() ){
 
-                try{
-                    String response =  ServiceHandler.makeServiceCall
-                            (AppSettings.SERVER_URL +"update.php?updatedId="+lastId, ServiceHandler.GET);
-                    if(!TextUtils.isEmpty( response )){
+            String response =  ServiceHandler.makeServiceCall
+                    (AppSettings.SERVER_URL +"update.php?updatedId="+lastId, ServiceHandler.GET);
+            if(!TextUtils.isEmpty( response )){
 
-                        Log.e(TAG, response + " response for new update");
-                        StudentUpdateHandler studentHandler = new StudentUpdateHandler(mContext);
-                        ArrayList<ContentProviderOperation> operations =
-                                studentHandler.parse(response);
-                        syncSummary.putInt(UPDATE_COUNT, studentHandler.getStudentCount());
-                        batch.addAll( operations );
-                        /*if ( AccountUtils.getUserChapter(mContext) != null){
-                            String chapter = AccountUtils.getUserChapter(mContext);
-                            Log.e(TAG, chapter + " chapter for new update");
-                            new AppHelper(mContext).pullAndSaveStudentChapterDataForSync(chapter);
-                        }*/
-                        //new AppHelper().pullAndSaveStudentChapterDataForSync(mContext);
+                Log.e(TAG, response + " response for new update");
+                /*StudentUpdateHandler studentHandler = new StudentUpdateHandler(mContext);
+                ArrayList<ContentProviderOperation> operations =
+                        studentHandler.parse(response);
+                syncSummary.putInt(UPDATE_COUNT, studentHandler.getStudentCount());
+                batch.addAll( operations );
+                if ( AccountUtils.getUserChapter(mContext) != null){
+                    String chapter = AccountUtils.getUserChapter(mContext);
+                    Log.e(TAG, chapter + " chapter for new update");
+                    new AppHelper(mContext).pullAndSaveStudentChapterDataForSync(chapter);
+                }*/
+                //new AppHelper().pullAndSaveStudentChapterDataForSync(mContext);
 
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+            }
 
-                if ( batch.size() > 0 ){
+            if ( batch.size() > 0 ){
                     try {
                         resolver.applyBatch(DataContract.CONTENT_AUTHORITY, batch);
                     } catch (RemoteException | OperationApplicationException e) {

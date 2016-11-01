@@ -1,13 +1,16 @@
 package com.jcedar.sdahyoruba.ui;
 
 import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -16,9 +19,11 @@ import android.support.v4.app.ShareCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
+import android.text.Spanned;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -33,7 +38,6 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.jcedar.sdahyoruba.R;
 import com.jcedar.sdahyoruba.helper.PrefUtils;
 import com.jcedar.sdahyoruba.helper.UIUtils;
-import com.jcedar.sdahyoruba.provider.AndroidDatabaseManager;
 import com.jcedar.sdahyoruba.provider.DataContract;
 import com.jcedar.sdahyoruba.provider.DatabaseHelper;
 import com.jcedar.sdahyoruba.ui.HymnListFragment.Listener;
@@ -60,7 +64,10 @@ public class NewDashBoardActivity extends AppCompatActivity implements
     private Set<Fragment> mHomeFragments = new HashSet<>();
     private ActionBarDrawerToggle drawerToggle;
 
+    View view;
+
     PagerFragment pagerFragment = new PagerFragment();
+    private Fragment mContent;
 
     public Toolbar getToolbar() {
         return toolbar;
@@ -71,8 +78,16 @@ public class NewDashBoardActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        /*if(getResources().getBoolean(R.bool.portrait_only)){
+        /**
+         * This will lock the orietation to portrait on mobile
+         * and landscape on tab and bigger devices
+         * if(getResources().getBoolean(R.bool.portrait_only)){
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        }*/
+
+        /*if( savedInstanceState != null ){
+            //restore fragment's instance
+            mContent = getSupportFragmentManager().getFragment( savedInstanceState, "mContent");
         }*/
 
         setContentView(R.layout.activity_new_dashboard);
@@ -93,6 +108,7 @@ public class NewDashBoardActivity extends AppCompatActivity implements
         navigationView = (NavigationView) findViewById(R.id.navigation_view);
         View headerView = navigationView.inflateHeaderView(R.layout.drawer_header);
 
+        view = headerView;
 
         // Initializing Drawer Layout and ActionBarToggle
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer);
@@ -136,31 +152,6 @@ public class NewDashBoardActivity extends AppCompatActivity implements
         roleString.setTextColor(getResources().getColor(R.color.white));
 
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-
-       /* Bundle extras = getIntent().getExtras();
-
-        if( extras != null ){
-            String in = extras.getString(FAVORITE_ID);
-            long id = 0;
-            if (in != null) {
-                id = Long.parseLong(in);
-            }else
-                Log.e(TAG ,  " in is null");
-            Log.e(TAG, in + " in");
-
-
-
-            FragmentTransaction ft1 = getSupportFragmentManager().beginTransaction();
-            ft1.replace(R.id.frame, PagerFragment.newInstance(id), "HOME")
-                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                    .commit();
-
-        }else{
-            Log.e(TAG , " extras is empty");
-            ft.replace(R.id.frame, pagerFragment, "HOME")
-                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                    .commit();
-        }*/
 
         ft.replace(R.id.frame, pagerFragment, "HOME")
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
@@ -233,16 +224,48 @@ public class NewDashBoardActivity extends AppCompatActivity implements
                     e.printStackTrace();
                 }
 
-                FragmentManager fm = getSupportFragmentManager();
-                if( getSupportFragmentManager().findFragmentByTag("HOME") != null){
-                        //|| getSupportFragmentManager().findFragmentByTag("HOME").isVisible()){
-                    fm.beginTransaction().remove(pagerFragment).commit();
+                if( item.getItemId() == R.id.nav_index){
+                    final Fragment finalFragment = fragment;
+                    new android.os.Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            FragmentManager fm = getSupportFragmentManager();
+                            if( getSupportFragmentManager().findFragmentByTag("HOME") != null){
+                                fm.beginTransaction().remove(pagerFragment).commit();
+                            }
+                            fm.beginTransaction()
+                                    .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
+                                    .replace(R.id.frame, finalFragment).commit();
+                        }
+                    }, 0);
+                } else {
+                    FragmentManager fm = getSupportFragmentManager();
+                    if (getSupportFragmentManager().findFragmentByTag("HOME") != null) {
+                        fm.beginTransaction().remove(pagerFragment).commit();
+                    }
+                    fm.beginTransaction().replace(R.id.frame, fragment).commit();
                 }
-                fm.beginTransaction().replace(R.id.frame, fragment).commit();
-
                 return true;
             }
         });
+    }
+
+    /*@Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        //save the fragment state
+        getSupportFragmentManager().putFragment( outState, "mContent", mContent );
+    }*/
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        /*new android.os.Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                drawerLayout.closeDrawer( view );
+            }
+        }, 0);*/
     }
 
 
@@ -299,7 +322,7 @@ public class NewDashBoardActivity extends AppCompatActivity implements
                 drawerLayout.openDrawer(GravityCompat.START);
                 return true;
             case R.id.action_settings:
-                startActivity(new Intent(this, AndroidDatabaseManager.class));
+                startActivity(new Intent(this, Settings.class));
                 return true;
         }
 
@@ -386,33 +409,72 @@ public class NewDashBoardActivity extends AppCompatActivity implements
     @Override
     public void onHymnSharedFab(int position) {
         String[] hymn = new DatabaseHelper(this).getItemAtPosition(position);
-        String stringToShare = String.format("Hymn %s\n%s\n%s", hymn[0], hymn[1], Html.fromHtml(hymn[2]));
-        Log.e(TAG, "hymn no 1 = " + hymn[0] + " \nHymn name 1 = " + hymn[1]);
-        stringToShare +="\n\nSDAH Yoruba (c) 2016";
 
-        Intent intent = new Intent(Intent.ACTION_SEND);
-        intent.setType("text/plain")
-                .putExtra(Intent.EXTRA_TEXT, stringToShare);
+        String text = hymn[2].replaceAll("(\r\n|\n\r|\r|\n)", "<br />");
+        Spanned toPresent = Html.fromHtml(text.trim());
 
-        startActivity(Intent.createChooser(intent, "Share Hymn"));
+        final String stringToShare = "Hymn " + hymn[0] + "\n" + hymn[1] + "\n" + toPresent + "\nSDAH Yoruba (c) 2016";
+
+        AlertDialog.Builder builder = new AlertDialog.Builder( this ).setMessage(stringToShare);
+               builder.setPositiveButton("Share", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent intent = new Intent(Intent.ACTION_SEND);
+                        intent.setType("text/plain")
+                                .putExtra(Intent.EXTRA_TEXT, stringToShare);
+
+                        startActivity(Intent.createChooser(intent,
+                                getResources().getString(R.string.action_share_hymn)));
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
+                .create();
+
+        builder.setMessage(stringToShare);
+        builder.setTitle("Share Hymn ");
+        builder.show();
+
+
     }
 
     @Override
     public void onHymnLikedFab(int position) {
-        String[] hymn = new DatabaseHelper(this).getItemAtPosition(position);
-        Log.e(TAG, "hymn no = " + hymn[0] + " \nHymn name = " + hymn[1]);
+        if( isAlreadyFavorite(position) ){
+            Snackbar.make(view, R.string.already_added, Snackbar.LENGTH_SHORT).show();
 
-        try {
-            ContentValues values = new ContentValues();
-            values.put(DataContract.FavoriteHymns.SONG_ID, hymn[0]);
-            values.put(DataContract.FavoriteHymns.SONG_NAME, hymn[1]);
-            values.put(DataContract.FavoriteHymns.SONG_TEXT, hymn[2]);
-            values.put(DataContract.FavoriteHymns.ENGLISH_VERSION, hymn[3]);
+        } else {
+            String[] hymn = new DatabaseHelper(this).getItemAtPosition(position);
+            Log.e(TAG, "hymn no = " + hymn[0] + " \nHymn name = " + hymn[1]);
 
-            getContentResolver().insert(DataContract.FavoriteHymns.CONTENT_URI, values);
-            Toast.makeText(this, "Added successfully", Toast.LENGTH_SHORT).show();
-        }catch (Exception e){
-            Toast.makeText(this, "Please try again later", Toast.LENGTH_SHORT).show();
+            try {
+                ContentValues values = new ContentValues();
+                values.put(DataContract.FavoriteHymns.SONG_ID, hymn[0]);
+                values.put(DataContract.FavoriteHymns.SONG_NAME, hymn[1]);
+                values.put(DataContract.FavoriteHymns.SONG_TEXT, hymn[2]);
+                values.put(DataContract.FavoriteHymns.ENGLISH_VERSION, hymn[3]);
+
+                getContentResolver().insert(DataContract.FavoriteHymns.CONTENT_URI, values);
+                //Toast.makeText(this, R.string.added_successfully, Toast.LENGTH_SHORT).show();
+
+                Snackbar.make(view, R.string.added_successfully, Snackbar.LENGTH_SHORT).show();
+            } catch (Exception e) {
+                Toast.makeText(this, R.string.generic_error, Toast.LENGTH_SHORT).show();
+            }
         }
+    }
+
+    private boolean isAlreadyFavorite(int position){
+        Cursor cursor = getContentResolver().query(DataContract.FavoriteHymns.CONTENT_URI,
+                null, DataContract.FavoriteHymns.SONG_ID+"=?", new String[]{position+""}, null);
+
+        if (cursor.moveToFirst()) {
+                return true;
+        }
+        return false;
     }
 }

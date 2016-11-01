@@ -12,8 +12,9 @@
     <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
          android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/grey_frame_on_white"
-    >
+        android:background="@color/white"
+
+    ><!--android:background="@drawable/grey_frame_on_white"-->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -25,7 +26,7 @@
             android:layout_height="match_parent"
             android:orientation="vertical"
             android:layout_margin="10dp"
-            android:elevation="1dp">
+            android:elevation="2dp">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -51,7 +52,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="25dp"
-                    android:textColor="@color/black_semi_transparent"
+                    android:textColor="@color/fragment_black"
                     android:fontFamily="san-serif"
                     android:textStyle="bold"/>
 
@@ -61,7 +62,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="0.5"
                     android:text="@string/hyphen"
-                    android:textColor="@color/black_semi_transparent"
+                    android:textColor="@color/fragment_black"
                     android:textStyle="bold"
                     android:fontFamily="san-serif"
                     android:textSize="25sp"/>
@@ -71,7 +72,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="0.5"
-                    android:textColor="@color/black_semi_transparent"
+                    android:textColor="@color/fragment_black"
                     android:textStyle="bold"
                     android:fontFamily="san-serif"
                     android:textSize="25sp"
@@ -95,7 +96,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="0"
-                android:textColor="@color/black_semi_transparent"
+                android:textColor="@color/fragment_black"
                 android:textStyle="normal"
                 android:fontFamily="san-serif"
                 android:textSize="18sp"/>
@@ -123,6 +124,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="5"
+                        android:textColor="@color/fragment_black"
                         android:textSize="18sp"
                         android:fontFamily="@string/mdtp_sans_serif"/>
 

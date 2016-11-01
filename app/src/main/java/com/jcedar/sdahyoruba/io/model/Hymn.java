@@ -48,8 +48,29 @@ public class Hymn {
         return englishVersion;
     }
 
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public void setSongId(String songId) {
+        this.songId = songId;
+    }
+
+    public void setSongText(String songText) {
+        this.songText = songText;
+    }
+
+    public void setSongTitle(String songTitle) {
+        this.songTitle = songTitle;
+    }
+
+    public void setEnglishVersion(String englishVersion) {
+        this.englishVersion = englishVersion;
+    }
+
     public static Hymn[] fromJson(String json){
         return new GsonBuilder().excludeFieldsWithoutExposeAnnotation()
                 .create().fromJson(json,  Hymn[].class);
     }
+
 }

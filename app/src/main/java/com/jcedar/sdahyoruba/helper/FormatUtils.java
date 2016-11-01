@@ -106,8 +106,7 @@ public class FormatUtils {
         return dt.toString(formatter);
     }
 
-    public static String ellipsize(String input) {
-        int maxLength = 25;
+    public static String ellipsize(String input, int maxLength) {
         String ellip = "...";
         if (input == null || input.length() <= maxLength
                 || input.length() < ellip.length()) {

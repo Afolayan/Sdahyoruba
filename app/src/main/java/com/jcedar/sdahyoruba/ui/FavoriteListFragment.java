@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -14,6 +15,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -25,8 +27,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bignerdranch.android.multiselector.MultiSelector;
 import com.jcedar.sdahyoruba.R;
-import com.jcedar.sdahyoruba.adapter.RecyclerCursorAdapterAll;
+import com.jcedar.sdahyoruba.adapter.RecyclerCursorAdapter;
 import com.jcedar.sdahyoruba.provider.DataContract;
 
 import java.util.Arrays;
@@ -43,20 +46,16 @@ public class FavoriteListFragment extends Fragment implements LoaderManager.Load
     private static final String ARG_IDS = "ids";
     private static final String SEARCH_KEY = "SEARCH_KEY";
 
-    // TODO: Rename and change types of parameters
-    private int mPosition;
-    private String mParam2;
-    private TextView tvError;
-    private Bundle mHomeBundle = Bundle.EMPTY;
-    private String _POSITION = "position";
-    private String LOADER_KEY = "loader_key";
+
     private Listener mCallback;
     static String context;
 
-    RecyclerView recyclerView;
-    RecyclerCursorAdapterAll resultsCursorAdapter;
+    public RecyclerView recyclerView;
+    public RecyclerCursorAdapter cursorAdapter;
     View rootView;
     String[] idsToLoad;
+
+    MultiSelector mMultiSelector;
 
     private static final int NORMAL_LOADER_ID = 1;
 
@@ -64,11 +63,38 @@ public class FavoriteListFragment extends Fragment implements LoaderManager.Load
 
     static int presentId;
 
+    ItemTouchHelper.SimpleCallback simpleCallback =
+            new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+        @Override
+        public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder,
+                              RecyclerView.ViewHolder target) {
+            return false;
+        }
+
+        @Override
+        public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+            RecyclerCursorAdapter.HymnViewHolder holder =
+                    (RecyclerCursorAdapter.HymnViewHolder)viewHolder;
+
+            int position = viewHolder.getAdapterPosition() + 1;
+
+            String id = holder.getTag();
+            Log.e(TAG, "swiped position is " + position+" tag == "+id);
+
+            getActivity().getContentResolver()
+                    .delete(DataContract.FavoriteHymns.CONTENT_URI,
+                            DataContract.FavoriteHymns.SONG_ID + "=?",
+                            new String[]{id + ""});
+            recyclerView.getAdapter().notifyItemRemoved(position);
+            Snackbar.make(rootView, R.string.item_removed, Snackbar.LENGTH_SHORT).show();
+        }
+    };
+    private TextView tvError;
+
     public static FavoriteListFragment newInstance(int position) {
         FavoriteListFragment fragment = new FavoriteListFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_PARAM1, position);
-
 
         fragment.setArguments(args);
         return fragment;
@@ -100,12 +126,6 @@ public class FavoriteListFragment extends Fragment implements LoaderManager.Load
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        /*if ( savedInstanceState != null){
-            presentId = savedInstanceState.getInt(LOADER_KEY);
-        } else {
-            presentId = NORMAL_LOADER_ID;
-        }*/
-
         if (getArguments() != null) {
             idsToLoad = getArguments().getStringArray(ARG_IDS);
             Log.e(TAG, "ids " + Arrays.toString(idsToLoad));
@@ -119,13 +139,6 @@ public class FavoriteListFragment extends Fragment implements LoaderManager.Load
         setHasOptionsMenu(true);
     }
 
-    /*@Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-
-        outState.putInt(LOADER_KEY, presentId);
-        Log.e(TAG, "present id " + presentId);
-    }*/
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -148,19 +161,22 @@ public class FavoriteListFragment extends Fragment implements LoaderManager.Load
         tvError = (TextView) rootView.findViewById(R.id.tvErrorMag);
 
         recyclerView = (RecyclerView) rootView.findViewById( R.id.recyclerview );
-        resultsCursorAdapter = new RecyclerCursorAdapterAll( getActivity() );
+        cursorAdapter = new RecyclerCursorAdapter( getActivity(), FavoriteListFragment.this );
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         //recyclerView.setLayoutManager(new WrappingLinearLayoutManager(getContext()));
         recyclerView.setNestedScrollingEnabled(false);
         recyclerView.setHasFixedSize(false);
 
-        recyclerView.setAdapter(resultsCursorAdapter);
+        recyclerView.setAdapter(cursorAdapter);
 
         RecyclerView.ItemAnimator itemAnimator = new DefaultItemAnimator();
         itemAnimator.setAddDuration(1000);
         itemAnimator.setRemoveDuration(1000);
         recyclerView.setItemAnimator(itemAnimator);
+
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleCallback);
+        itemTouchHelper.attachToRecyclerView(recyclerView);
 
 
         new Handler().post(new Runnable() {
@@ -169,27 +185,35 @@ public class FavoriteListFragment extends Fragment implements LoaderManager.Load
                 getActivity().setTitle("Favorites");
             }
         });
-        resultsCursorAdapter.setOnItemClickListener(new RecyclerCursorAdapterAll.OnItemClickListener() {
-            @Override
-            public void onItemClicked(Cursor data) {
-
-                long Id = data.getLong(
-                        data.getColumnIndex(DataContract.FavoriteHymns.SONG_ID));
-
-                // add position to bundle
-                //mHomeBundle.putInt(_POSITION, position);
-                mCallback.onFavoriteSelected(Id);
-
-
-            }
-        });
+        cursorAdapter.setOnItemClickListener(listener);
+        cursorAdapter.setOnLongClickListener(long_listener);
 
         return rootView;
 
     }
 
 
+    private RecyclerCursorAdapter.OnLongClickListener long_listener =
+            new RecyclerCursorAdapter.OnLongClickListener() {
+                @Override
+                public void onLongClicked(boolean clicked) {
+                    Log.e(TAG, "on long clicked "+clicked);
+                }
+            };
 
+    RecyclerCursorAdapter.OnItemClickListener listener =
+            new RecyclerCursorAdapter.OnItemClickListener() {
+        @Override
+        public void onItemClicked(Cursor data) {
+
+            long Id = data.getLong(
+                    data.getColumnIndex(DataContract.FavoriteHymns.SONG_ID));
+
+            mCallback.onFavoriteSelected(Id);
+
+
+        }
+    };
     @Override
     public void onOptionsMenuClosed(Menu menu) {
         super.onOptionsMenuClosed(menu);
@@ -204,10 +228,10 @@ public class FavoriteListFragment extends Fragment implements LoaderManager.Load
             try {
                 getActivity().getContentResolver().
                         delete(DataContract.FavoriteHymns.CONTENT_URI, null, null);
-                Toast.makeText(getActivity(), "Favourite list cleared", Toast.LENGTH_SHORT).show();
                 getLoaderManager().restartLoader(NORMAL_LOADER_ID, null, FavoriteListFragment.this);
+                Toast.makeText(getActivity(), R.string.fav_list_cleared, Toast.LENGTH_SHORT).show();
             }catch (Exception e){
-                Toast.makeText(getActivity(), "Something happened, try again later", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), R.string.generic_error, Toast.LENGTH_SHORT).show();
             }
         }
         return true;
@@ -289,6 +313,7 @@ public class FavoriteListFragment extends Fragment implements LoaderManager.Load
             }
         });
     }
+
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         Uri uri = DataContract.FavoriteHymns.CONTENT_URI;
@@ -349,20 +374,22 @@ public class FavoriteListFragment extends Fragment implements LoaderManager.Load
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
 
         if(cursor.moveToFirst()) {
-            resultsCursorAdapter.swapCursor(cursor);
+            cursorAdapter.swapCursor(cursor);
         } else {
-            Toast.makeText(getActivity(), "No favorite hymn added yet", Toast.LENGTH_SHORT).show();
+            tvError.setText(R.string.no_favorite_hymn);
+            tvError.setVisibility(View.VISIBLE);
+            Toast.makeText(getActivity(), R.string.no_favorite_hymn, Toast.LENGTH_SHORT).show();
         }
 
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        //resultsCursorAdapter.swapCursor(null);
+        //cursorAdapter.swapCursor(null);
     }
 
 
-    private void updateDashboard() {
+    public void updateFavList() {
         try {
             getLoaderManager().restartLoader(presentId, null, this);
         } catch (Exception e) {
@@ -375,13 +402,12 @@ public class FavoriteListFragment extends Fragment implements LoaderManager.Load
     @Override
     public void onResume() {
         super.onResume();
-        updateDashboard();
+        updateFavList();
     }
 
     @Override
     public void onViewStateRestored(Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
     }
-
 
 }

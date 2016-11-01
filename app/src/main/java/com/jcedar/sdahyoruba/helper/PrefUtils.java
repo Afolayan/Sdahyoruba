@@ -58,18 +58,6 @@ public class PrefUtils {
 
 
 
-
-    public static void setPhoto(Context context, Bitmap image){
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        preferences.edit().putString(PHOTO_KEY, encodeTobase64(image)).apply();
-    }
-
-    public static Bitmap getPhoto(Context context) {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        String image = preferences.getString(PHOTO_KEY, "0");
-        return decodeBase64(image);
-    }
-
     public static String encodeTobase64(Bitmap image) {
         Bitmap immage = image;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();

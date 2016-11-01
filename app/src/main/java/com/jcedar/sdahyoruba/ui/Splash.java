@@ -1,16 +1,18 @@
 package com.jcedar.sdahyoruba.ui;
 
-import com.jcedar.sdahyoruba.ui.util.SystemUiHider;
-
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 
 import com.jcedar.sdahyoruba.R;
+import com.jcedar.sdahyoruba.ui.util.SystemUiHider;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -50,11 +52,13 @@ public class Splash extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        fullScreen();
         setContentView(R.layout.activity_splash);
 
         final View controlsView = findViewById(R.id.fullscreen_content_controls);
         final View contentView = findViewById(R.id.fullscreen_content);
+
+
 
         // Set up an instance of SystemUiHider to control the system UI for
         // this activity.
@@ -113,7 +117,13 @@ public class Splash extends Activity {
         // Upon interacting with UI controls, delay any scheduled hide()
         // operations to prevent the jarring behavior of controls going away
         // while interacting with the UI.
-        findViewById(R.id.dummy_button).setOnTouchListener(mDelayHideTouchListener);
+        //findViewById(R.id.dummy_button).setOnTouchListener(mDelayHideTouchListener);
+    }
+
+    private void fullScreen() {
+        requestWindowFeature( Window.FEATURE_NO_TITLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
     }
 
     @Override
@@ -124,6 +134,16 @@ public class Splash extends Activity {
         // created, to briefly hint to the user that UI controls
         // are available.
         delayedHide(100);
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                startActivity(new Intent(Splash.this, GoogleSignIn.class));
+                Splash.this.finish();
+
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+            }
+        }, 3000);
     }
 
 

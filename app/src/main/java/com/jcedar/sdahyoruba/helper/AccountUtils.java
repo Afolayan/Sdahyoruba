@@ -24,32 +24,14 @@ public class AccountUtils {
     private static final String TAG = AccountUtils.class.toString();
 
     private static final String PREF_CHOSEN_ACCOUNT = "chosen_account";
-//    private static final String PREF_LOGGED_OUT_ACCOUNT = "logged_out_account";
     private static final String PREF_AUTH_TOKEN = "auth_token";
     private static final String PREF_FIRST_RUN = "firstRun";
-    private static final String PREF_SETUP_DONE = "done_setup";
-
-    public static final String PREF_ORGANIZATION = "organisation";
     public static final String PREF_FULLNAME = "fullName";
-    public static final String PREF_REG_ID = "regId";
-
-//    public static final String PREF_ROLE_ID = "roleId";
     public static final String PREF_ROLE = "roleName";
-    private static final String PREF_GENDER = "gender";
     private static final String PREF_EMAIL = "email";
-    private static final String PREF_COURSE = "course";
-    private static final String PREF_CHAPTER = "chapter";
-    private static final String PREF_PHONE_NUMBER = "phone_number";
-    private static final String PREF_DOB = "date_of_birth";
-    private static final String PREF_ALUMNI = "isAlumni";
     public static final String PROPERTY_REG_ID = "registration_id";
     public static final String PROPERTY_APP_VERSION = "appVersion";
     private static final String PREF_SERVER_ID = "server_id";
-    private static final String PREF_DOB_NUMBER = "dob_number";
-
-    String hash = "+MpC+7H4vWDozl9v3x+c26fTirY=";
-    private static final String PREF_NAME = "name";
-    private static final String PREF_ID = "_id";
 
 
     public static String getChosenAccountName(final Context context) {
@@ -65,25 +47,9 @@ public class AccountUtils {
         Log.d(TAG, "Auth Token: " + authToken);
     }
 
-
-    public static void setFullName(final Context context, final String fullName){
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
-        sp.edit().putString(PREF_FULLNAME, fullName).apply();
-    }
-
     public static String getFullName(final Context context) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
         return sp.getString(PREF_FULLNAME, null);
-    }
-
-    public static void setRegId(final Context context, final String regid){
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
-        sp.edit().putString(PREF_REG_ID, regid).apply();
-    }
-
-    public static void setRole(final Context context, final String roleName){
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
-        sp.edit().putString(PREF_ROLE, roleName).apply();
     }
 
     public static String getRole(final Context context) {
@@ -169,58 +135,11 @@ public class AccountUtils {
         setAuthToken(context, null);
     }
 
-    public static void setUserName(final Context context, final String name){
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
-        sp.edit().putString(PREF_NAME, name).apply();
-    }
-
-    public static String getUserName(final Context context) {
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
-        return sp.getString(PREF_NAME, null);
-    }
-
-    public static void setUserId(final Context context, final String userId){
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
-        sp.edit().putString(PREF_ID, userId).apply();
-    }
-
-    public static String getUserId(final Context context) {
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
-        return sp.getString(PREF_ID, null);
-    }
-
-    public static void setId(final Context context, final String userId){
-            SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
-            sp.edit().putString(PREF_SERVER_ID, userId).apply();
-        }
-
-        public static String getId(final Context context) {
+   public static String getId(final Context context) {
             SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
             return sp.getString(PREF_SERVER_ID, "");
         }
 
-
-
-    public static void setUserGender(final Context context, final String gender){
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
-        sp.edit().putString(PREF_GENDER, gender).apply();
-    }
-
-    public static String getUserGender(final Context context) {
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
-        return sp.getString(PREF_GENDER, null);
-    }
-
-
-    public static void setUserChapter(final Context context, final String chapter){
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
-        sp.edit().putString(PREF_CHAPTER, chapter).apply();
-    }
-
-    public static String getUserChapter(final Context context) {
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
-        return sp.getString(PREF_CHAPTER, null);
-    }
 
 
     public static void setUserEmail(final Context context, final String email){
@@ -231,58 +150,6 @@ public class AccountUtils {
     public static String getUserEmail(final Context context) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
         return sp.getString(PREF_EMAIL, null);
-    }
-
-    public static void setUserCourse(final Context context, final String course){
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
-        sp.edit().putString(PREF_COURSE, course).apply();
-    }
-
-    public static String getUserCourse(final Context context) {
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
-        return sp.getString(PREF_COURSE, null);
-    }
-
-    public static void setUserPhoneNumber(final Context context, final String phone){
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
-        sp.edit().putString(PREF_PHONE_NUMBER, phone).apply();
-    }
-
-    public static String getUserPhoneNumber(final Context context) {
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
-        return sp.getString(PREF_PHONE_NUMBER, null);
-    }
-
-    public static void setIsAlumni(final Context context, final boolean isAlumni){
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
-        sp.edit().putBoolean(PREF_ALUMNI, isAlumni).apply();
-    }
-
-    public static boolean isAlumni(final Context context) {
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
-        return sp.getBoolean(PREF_ALUMNI, false);
-    }
-
-
-
-    public static void setUserDOB(final Context context, final String dob){
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
-        sp.edit().putString(PREF_DOB, dob).apply();
-    }
-
-    public static String getUserDOB(final Context context) {
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
-        return sp.getString(PREF_DOB, null);
-    }
-
-    public static void setUserDOBNumber(final Context context, final String dob){
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
-        sp.edit().putString(PREF_DOB_NUMBER, dob).apply();
-    }
-
-    public static String getUserDOBNumber(final Context context) {
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
-        return sp.getString(PREF_DOB_NUMBER, null);
     }
 
     private static final String PREF_PHONE_NUMBER_1 = "phone_number1";
