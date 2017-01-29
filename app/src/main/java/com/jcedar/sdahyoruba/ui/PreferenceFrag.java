@@ -3,16 +3,18 @@ package com.jcedar.sdahyoruba.ui;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
+import android.preference.ListPreference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.SwitchPreference;
 
 import com.jcedar.sdahyoruba.R;
 
-public class Preference extends PreferenceFragment {
+public class PreferenceFrag extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener{
 
     @Override
     public void onAttach(Activity activity) {
@@ -34,16 +36,6 @@ public class Preference extends PreferenceFragment {
 
         addPreferencesFromResource(R.xml.preferences);
 
-        /*EditTextPreference versionPref = (EditTextPreference)findPreference("version");
-        String version = null;
-        try {
-            version = getActivity().getPackageManager()
-                    .getPackageInfo(getActivity().getPackageName(), 0).versionName;
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
-        versionPref.setTitle(getString(R.string.version) + ": " + version);
-*/
         EditTextPreference devPref = (EditTextPreference)findPreference("developer");
         //devPref.setSummary("Afolayan Oluwaseyi");
         devPref.setOnPreferenceClickListener(new android.preference.Preference.OnPreferenceClickListener() {
@@ -70,6 +62,7 @@ public class Preference extends PreferenceFragment {
             }
         });
 
+        changeFontSize();
 
 
     }
@@ -95,4 +88,27 @@ public class Preference extends PreferenceFragment {
         }
     }
 
+    private void changeFontSize(){
+        final SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        Resources resources = getActivity().getResources();
+        String fontSize = settings.getString("fonts", "20");
+
+        ListPreference fontPref = (ListPreference) findPreference("fonts");
+        fontPref.setOnPreferenceChangeListener(new android.preference.Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(android.preference.Preference preference, Object newValue) {
+                settings
+                return false;
+            }
+        });
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        updatePrefSummary(findPreference(key));
+    }
+
+    private void updatePrefSummary(PreferenceFrag preferenceFrag) {
+
+    }
 }
